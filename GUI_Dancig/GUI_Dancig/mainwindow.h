@@ -6,13 +6,9 @@
 #include <QMainWindow>
 #include <QModelIndex>
 
-struct duga{
-    bool changed = false;
-    int k;
-    int x1, x2, x3, x4;
-    int k_1;
-    int k_2;
-
+struct vspom_strucr{
+    int x;
+    int y;
 };
 
 namespace Ui {
@@ -39,7 +35,7 @@ private:
     QStandardItemModel *model_2;
     QStandardItemModel *model_3;
     QStandardItemModel *model_4;
-    QVector <duga> vec_duga [100];
+    QVector <vspom_strucr> vec_duga;
     QString **ss;
     QStandardItem *item_2;
     QStandardItem *item;
@@ -47,6 +43,7 @@ private:
     int **elements;
     int **init_elements;
     int **before_elements;
+    int **vspom_matrix;
     QString chars;
     int size;
     Ui::MainWindow *ui;

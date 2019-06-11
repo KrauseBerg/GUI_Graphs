@@ -19,12 +19,17 @@ void MainWindow::on_create_clicked(){
     model_2 = new QStandardItemModel;
     size = ui->size->text().toInt();
     ss = new QString *[size];
+    vspom_matrix = new int*[size];
     for (int i = 0; i < size; i++) {
+        vspom_matrix[i] = new int[size];
         ss[i] = new QString [size];
         for (int j = 0; j < size; j++) {
+            if(i != j)
+                ss[i][j] = "(" + QString::number(i+1) + ", " + QString::number(j+1) + ")";
             item = new QStandardItem(QString("0"));
             item->setTextAlignment(Qt::AlignCenter);
             model->setItem(i, j, item);
+            vspom_matrix[i][j] = j;
         }
     }
     ui->initial->setModel(model);
@@ -105,165 +110,60 @@ void MainWindow::on_next_clicked(){
 
     model_3 = new QStandardItemModel;
 
-    duga duga;
-    duga.k = -1;
-    duga.k_1 = -1;
-    duga.k_2 = -1;
-    for (int i =  0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            vec_duga[i].push_back(duga);
-        }
-    }
-
     for (int i = 0; i < before_num + 1; i++) {
         elements[i] = new int[before_num + 1];
         for (int j = 0; j < before_num + 1; j++) {
             if( i == before_num && j < before_num ){
                 int perem = 0xFFFF;
+                int vspom_z = 0;
                 for (int z = 0 ; z < before_num; z ++ ) {
                     elem = init_elements[i][z] + before_elements[z][j];
                     if (elem < perem){
+                        vspom_z = z;
                         perem = elem;
-                        vec_duga[i][j].x1 = i + 1;
-                        vec_duga[i][j].x2 = z + 1;
-                        vec_duga[i][j].x3 = z + 1;
-                        vec_duga[i][j].x4 = j + 1;
-                        if(vec_duga[vec_duga[i][j].x1 - 1][vec_duga[i][j].x2 - 1].k == 4)
-                            vec_duga[i][j].k_1 = 1;
-                        if(vec_duga[vec_duga[i][j].x3 - 1][vec_duga[i][j].x4 - 1].k == 4)
-                            vec_duga[i][j].k_2 = 1;
-                        vec_duga[i][j].k = 4;
-                        if(vec_duga[i][j].x1 == vec_duga[i][j].x2)
-                            vec_duga[i][j].k = 2;
-                        if(vec_duga[i][j].x3 == vec_duga[i][j].x4)
-                            vec_duga[i][j].k = 1;
                     }
                 }
                 elements[i][j] = perem;
-                if(perem == 0xFFFF){
-                    ss[i][j] = "-";
-                }
-                else {
-                    if(vec_duga[i][j].k == 1)
-                        ss[i][j] = "(" + QString::number(vec_duga[i][j].x1) + ", " + QString::number(vec_duga[i][j].x2) + ")";
-                    if(vec_duga[i][j].k == 2)
-                        ss[i][j] = "(" + QString::number(vec_duga[i][j].x3) + ", " + QString::number(vec_duga[i][j].x4) + ")";
-                    if(vec_duga[i][j].k == 4){
-                        ss[i][j] = "(" + QString::number(vec_duga[i][j].x1) + ", " + QString::number(vec_duga[i][j].x2) + ")("
-                                + QString::number(vec_duga[i][j].x3) + ", " + QString::number(vec_duga[i][j].x4) + ")";
-                        if(vec_duga[i][j].k_1 == 1 && vec_duga[i][j].k_2 != 1)
-                            ss[i][j] = ss[vec_duga[i][j].x1 - 1][vec_duga[i][j].x2 - 1]+"("+ QString::number(vec_duga[i][j].x3) + ", " + QString::number(vec_duga[i][j].x4) + ")";
-                        if(vec_duga[i][j].k_2 == 1 && vec_duga[i][j].k_1 != 1)
-                            ss[i][j] = "(" + QString::number(vec_duga[i][j].x1) + ", " + QString::number(vec_duga[i][j].x2) + ")"+ss[vec_duga[i][j].x3 - 1][vec_duga[i][j].x4 - 1];
-                        if(vec_duga[i][j].k_2 == 1 && vec_duga[i][j].k_1 == 1)
-                            ss[i][j] = ss[vec_duga[i][j].x1 - 1][vec_duga[i][j].x2 - 1] + ss[vec_duga[i][j].x3 - 1][vec_duga[i][j].x4 - 1];
-                    }
-                }
+                if (j != vspom_z and perem != 0xFFFF)
+                    vspom_matrix[i][j] = vspom_z;
             }
             if( j == before_num && i < before_num){
                 int perem = 0xFFFF;
+                int vspom_z = 0;
                 for (int z = 0 ; z < before_num; z ++ ) {
                     elem = init_elements[z][j] + before_elements[i][z];
                     if(elem < perem){
+                        vspom_z = z;
                         perem = elem;
-                        vec_duga[i][j].x1 = i + 1;
-                        vec_duga[i][j].x2 = z + 1;
-                        vec_duga[i][j].x3 = z + 1;
-                        vec_duga[i][j].x4 = j + 1;
-                        if(vec_duga[vec_duga[i][j].x1 - 1][vec_duga[i][j].x2 - 1].k == 4)
-                            vec_duga[i][j].k_1 = 1;
-                        if(vec_duga[vec_duga[i][j].x3 - 1][vec_duga[i][j].x4 - 1].k == 4)
-                            vec_duga[i][j].k_2 = 1;
-                        vec_duga[i][j].k = 4;
-                        if(vec_duga[i][j].x1 == vec_duga[i][j].x2)
-                            vec_duga[i][j].k = 2;
-                        if(vec_duga[i][j].x3 == vec_duga[i][j].x4)
-                            vec_duga[i][j].k = 1;
                     }
                 }
                 elements[i][j] = perem;
-                if(perem == 0xFFFF){
-                    ss[i][j] = "-";
-                }
-                else{
-                    if(vec_duga[i][j].k == 1)
-                        ss[i][j] = "(" + QString::number(vec_duga[i][j].x1) + ", " + QString::number(vec_duga[i][j].x2) + ")";
-                    if(vec_duga[i][j].k == 2)
-                        ss[i][j] = "(" + QString::number(vec_duga[i][j].x3) + ", " + QString::number(vec_duga[i][j].x4) + ")";
-                    if(vec_duga[i][j].k == 4){
-                        ss[i][j] = "(" + QString::number(vec_duga[i][j].x1) + ", " + QString::number(vec_duga[i][j].x2) + ")("
-                                + QString::number(vec_duga[i][j].x3) + ", " + QString::number(vec_duga[i][j].x4) + ")";
-                        if(vec_duga[i][j].k_1 == 1 && vec_duga[i][j].k_2 != 1)
-                            ss[i][j] = ss[vec_duga[i][j].x1 - 1][vec_duga[i][j].x2 - 1]+"("+ QString::number(vec_duga[i][j].x3) + ", " + QString::number(vec_duga[i][j].x4) + ")";
-                        if(vec_duga[i][j].k_2 == 1 && vec_duga[i][j].k_1 != 1)
-                            ss[i][j] = "(" + QString::number(vec_duga[i][j].x1) + ", " + QString::number(vec_duga[i][j].x2) + ")"+ss[vec_duga[i][j].x3 - 1][vec_duga[i][j].x4 - 1];
-                        if(vec_duga[i][j].k_2 == 1 && vec_duga[i][j].k_1 == 1)
-                            ss[i][j] = ss[vec_duga[i][j].x1 - 1][vec_duga[i][j].x2 - 1] + ss[vec_duga[i][j].x3 - 1][vec_duga[i][j].x4 - 1];
-                    }
-                }
+                if (i != vspom_z and perem != 0xFFFF)
+                    vspom_matrix[i][j] = vspom_z;
             }
             if( i == j ){
                 elements[i][j] = 0;
                 ss[i][j] = "-";
-                vec_duga[i][j].k = 0;
             }
             else if( i < before_num && j < before_num){
                 int perem = 0xFFFF;
                 for (int z = 0 ; z < before_num; z ++ ) {
                     elem = init_elements[z][before_num] + before_elements[i][z];
-                    if(elem < perem){
+                    if(elem < perem)
                         perem = elem;
-                        vec_duga[i][j].x1 = i + 1;
-                        vec_duga[i][j].x2 = before_num + 1;
-                        if(vec_duga[vec_duga[i][j].x1 - 1][vec_duga[i][j].x2 - 1].k == 4)
-                            vec_duga[i][j].k_1 = 1;
-                    }
                 }
                 int perem_2 = 0xFFFF;
                 for (int z = 0 ; z < before_num; z ++ ) {
                     elem = init_elements[before_num][z] + before_elements[z][j];
-                    if(elem < perem_2){
+                    if(elem < perem_2)
                         perem_2 = elem;
-                        vec_duga[i][j].x3 = before_num + 1;
-                        vec_duga[i][j].x4 = j + 1;
-                        if(vec_duga[vec_duga[i][j].x3 - 1][vec_duga[i][j].x4 - 1].k == 4)
-                            vec_duga[i][j].k_2 = 1;
-                    }
                 }
                 if(perem + perem_2 < before_elements[i][j]){
                     elements[i][j] = perem + perem_2;
-                    if(perem + perem_2 == 0xFFFF)
-                        ss[i][j] = "-";
-                    else{
-                        vec_duga[i][j].k = 4;
-                        ss[i][j] = "(" + QString::number(vec_duga[i][j].x1) + ", " + QString::number(vec_duga[i][j].x2) + ")("
-                                + QString::number(vec_duga[i][j].x3) + ", " + QString::number(vec_duga[i][j].x4) + ")";
-                        if(vec_duga[i][j].k_1 == 1 && vec_duga[i][j].k_2 != 1)
-                            ss[i][j] = ss[vec_duga[i][j].x1 - 1][vec_duga[i][j].x2 - 1]+"("+ QString::number(vec_duga[i][j].x3) + ", " + QString::number(vec_duga[i][j].x4) + ")";
-                        if(vec_duga[i][j].k_2 == 1 && vec_duga[i][j].k_1 != 1)
-                            ss[i][j] = "(" + QString::number(vec_duga[i][j].x1) + ", " + QString::number(vec_duga[i][j].x2) + ")"+ss[vec_duga[i][j].x3 - 1][vec_duga[i][j].x4 - 1];
-                        if(vec_duga[i][j].k_2 == 1 && vec_duga[i][j].k_1 == 1)
-                            ss[i][j] = ss[vec_duga[i][j].x1 - 1][vec_duga[i][j].x2 - 1] + ss[vec_duga[i][j].x3 - 1][vec_duga[i][j].x4 - 1];
-                        if(vec_duga[i][j].x3 == vec_duga[i][j].x4){
-                            vec_duga[i][j].k = 1;
-                            ss[i][j] = "(" + QString::number(vec_duga[i][j].x1) + ", " + QString::number(vec_duga[i][j].x2) + ")";
-                        }
-                        if(vec_duga[i][j].x1 == vec_duga[i][j].x2){
-                            vec_duga[i][j].k = 2;
-                            ss[i][j] = "(" + QString::number(vec_duga[i][j].x3) + ", " + QString::number(vec_duga[i][j].x4) + ")";
-                        }
-                    }
-
+                    vspom_matrix[i][j] = before_num;
                 }
-                else{
+                else
                     elements[i][j] = before_elements[i][j];
-                    if(before_elements[i][j] == 0xFFFF)
-                        ss[i][j] = "-";
-                    else if(vec_duga[i][j].k != 4 && vec_duga[i][j].k != 2 && vec_duga[i][j].k != 1){
-                        ss[i][j] = "(" + QString::number(vec_duga[i][j].x1) + ", " + QString::number(vec_duga[i][j].x4) + ")";
-                        vec_duga[i][j].k = 3;
-                    }
-                }
             }
         }
     }
@@ -285,11 +185,13 @@ void MainWindow::on_next_clicked(){
         for (int i = 0 ; i < size; i ++ ) {
             for (int j = 0 ; j < size; j ++ ) {
                 item = new QStandardItem(QString::number(before_elements[i][j]));
+
                 if (before_elements[i][j] == 0xFFFF)
                     item = new QStandardItem(QString("∞"));
                 item->setTextAlignment(Qt::AlignCenter);
                 model_2->setItem(i, j, item);
             }
+
         }
         ui->before->setModel(model_2);
     }
@@ -302,6 +204,7 @@ void MainWindow::on_next_clicked(){
                 item->setTextAlignment(Qt::AlignCenter);
                 model_2->setItem(i, j, item);
             }
+
         }
         ui->before->setModel(model_2);
     }
@@ -310,11 +213,50 @@ void MainWindow::on_next_clicked(){
 
     for (int i = 0 ; i < size; i ++ ) {
         for (int j = 0 ; j < size; j ++ ) {
+            int vspom_per_j = j;
+            int vspom_Per_i = i;
+            QString vspom_str = "(" + QString::number(vspom_Per_i + 1) + ", ";
+            while(vspom_matrix[vspom_Per_i][vspom_per_j] != vspom_per_j){
+                ss[i][j] = vspom_str + QString::number(vspom_matrix[vspom_Per_i][vspom_per_j] + 1) + ")";
+                if(ss[vspom_Per_i][vspom_matrix[vspom_Per_i][vspom_per_j]].size() > 6)
+                    ss[i][j] = ss[vspom_Per_i][vspom_matrix[vspom_Per_i][vspom_per_j]];
+                if(vspom_matrix[vspom_Per_i][vspom_per_j] > j){
+                    vspom_strucr t;
+                    t.x = vspom_Per_i;
+                    t.y = j;
+                    vec_duga.push_back(t);
+                }
+                vspom_str = ss[i][j] + "(" + QString::number(vspom_matrix[vspom_Per_i][vspom_per_j] + 1) + ", ";
+                vspom_Per_i = vspom_matrix[vspom_Per_i][vspom_per_j];
+                if (vspom_matrix[vspom_Per_i][vspom_per_j] == vspom_per_j)
+                    ss[i][j] = ss[i][j] + "(" + QString::number(vspom_Per_i + 1) + ", " +
+                            QString::number(vspom_per_j + 1) + ")";
+            }
             item = new QStandardItem(ss[i][j]);
             item->setTextAlignment(Qt::AlignCenter);
             model_4->setItem(i, j, item);
         }
     }
+
+    for (int i = 0; i < vec_duga.size(); i++) {
+        int vspom_per_j = vec_duga[i].y;
+        int vspom_Per_i = vec_duga[i].x;
+        QString vspom_str = "(" + QString::number(vspom_Per_i + 1) + ", ";
+        while(vspom_matrix[vspom_Per_i][vspom_per_j] != vspom_per_j){
+            ss[vec_duga[i].x][vec_duga[i].y] = vspom_str + QString::number(vspom_matrix[vspom_Per_i][vspom_per_j] + 1) + ")";
+            if(ss[vspom_Per_i][vspom_matrix[vspom_Per_i][vspom_per_j]].size() > 6)
+                ss[vec_duga[i].x][vec_duga[i].y] = ss[vspom_Per_i][vspom_matrix[vspom_Per_i][vspom_per_j]];
+            vspom_str = ss[vec_duga[i].x][vec_duga[i].y] + "(" + QString::number(vspom_matrix[vspom_Per_i][vspom_per_j] + 1) + ", ";
+            vspom_Per_i = vspom_matrix[vspom_Per_i][vspom_per_j];
+            if (vspom_matrix[vspom_Per_i][vspom_per_j] == vspom_per_j)
+                ss[vec_duga[i].x][vec_duga[i].y] = ss[vec_duga[i].x][vec_duga[i].y] + "(" + QString::number(vspom_Per_i + 1) + ", " +
+                        QString::number(vspom_per_j + 1) + ")";
+        }
+        item = new QStandardItem(ss[vec_duga[i].x][vec_duga[i].y]);
+        item->setTextAlignment(Qt::AlignCenter);
+        model_4->setItem(vec_duga[i].x, vec_duga[i].y, item);
+    }
+
     ui->short_track->setModel(model_4);
 
     if(before_num + 1 == size)
